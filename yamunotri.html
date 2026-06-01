@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yamunotri — First Dham | Char Dham Yatra · Rocket Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Hind:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --saffron: #c8511a;
+        --saffron-light: #e8763a;
+        --gold: #c9922a;
+        --gold-light: #f0c060;
+        --deep: #0e0704;
+        --dark: #1a0c04;
+        --cream: #fdf6ea;
+        --cream-dark: #f2e4c8;
+        --text: #2c1a06;
+        --muted: #7a5c3a;
+        /* Yamunotri accent — river blue-teal */
+        --accent: #1a7a8a;
+        --accent-light: #2ab0c8;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Hind', sans-serif;
+        background: var(--cream);
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      /* ── LOADER ── */
+      #loader {
+        position: fixed; inset: 0;
+        background: var(--deep);
+        z-index: 9999;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 14px;
+        transition: opacity 0.7s ease, visibility 0.7s ease;
+      }
+      #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+      .loader-om { font-size: 4.5rem; color: var(--gold-light); animation: loaderPulse 1.4s ease-in-out infinite; text-shadow: 0 0 40px rgba(240,192,96,0.7); }
+      .loader-title { font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; color: var(--cream); letter-spacing: 3px; }
+      .loader-sub { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 3px; color: rgba(240,192,96,0.55); text-transform: uppercase; }
+      .loader-bar { width: 160px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+      .loader-fill { height: 100%; background: linear-gradient(to right, var(--accent), var(--gold-light)); animation: loaderBar 1.8s ease forwards; width: 0; }
+      @keyframes loaderPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.18);opacity:0.75} }
+      @keyframes loaderBar { from{width:0} to{width:100%} }
+
+      /* ── PROGRESS BAR ── */
+      #progressBar {
+        position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+        background: linear-gradient(to right, var(--accent), var(--gold-light));
+        z-index: 9998; transition: width 0.08s linear;
+        box-shadow: 0 0 10px rgba(42,176,200,0.7); pointer-events: none;
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed; top: 0; width: 100%;
+        background: rgba(14,7,4,0.92); backdrop-filter: blur(12px);
+        padding: 16px 6%; display: flex; justify-content: space-between; align-items: center;
+        z-index: 200; border-bottom: 1px solid rgba(26,122,138,0.35);
+        transition: padding 0.3s ease, background 0.3s ease;
+      }
+      nav.scrolled { padding: 10px 6%; background: rgba(14,7,4,0.98); }
+      .nav-logo { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold-light); letter-spacing: 2px; text-decoration: none; }
+      .nav-back {
+        font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.7); text-decoration: none; text-transform: uppercase;
+        display: flex; align-items: center; gap: 7px;
+        border: 1px solid rgba(255,255,255,0.2); padding: 7px 16px; border-radius: 30px;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .nav-back:hover { color: var(--gold-light); border-color: var(--gold); }
+
+      /* ── FLOATING PETALS ── */
+      .petal {
+        position: absolute; border-radius: 50% 0 50% 0;
+        animation: floatPetal linear infinite; pointer-events: none; z-index: 2;
+      }
+      @keyframes floatPetal {
+        0%   { transform:translateY(-60px) rotate(0deg) translateX(0); opacity:0; }
+        8%   { opacity:1; }
+        50%  { transform:translateY(50vh) rotate(360deg) translateX(30px); }
+        92%  { opacity:0.6; }
+        100% { transform:translateY(110vh) rotate(720deg) translateX(-20px); opacity:0; }
+      }
+
+      /* ── HERO ── */
+      .hero {
+        position: relative; width: 100%; height: 100vh; min-height: 600px;
+        overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;
+      }
+      .hero-image {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; object-position: center; will-change: transform;
+      }
+      .hero-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to bottom, rgba(5,20,25,0.6) 0%, rgba(5,20,25,0.3) 40%, rgba(5,20,25,0.7) 100%);
+      }
+      .hero-content {
+        position: relative; z-index: 10;
+        display: flex; flex-direction: column; align-items: center; gap: 16px;
+        padding: 0 20px; max-width: 860px;
+      }
+      .hero-content > * { animation: heroFadeUp 0.9s cubic-bezier(.22,1,.36,1) both; }
+      .hero-content > *:nth-child(1) { animation-delay:0.2s }
+      .hero-content > *:nth-child(2) { animation-delay:0.4s }
+      .hero-content > *:nth-child(3) { animation-delay:0.58s }
+      .hero-content > *:nth-child(4) { animation-delay:0.72s }
+      .hero-content > *:nth-child(5) { animation-delay:0.86s }
+      @keyframes heroFadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+      .hero-eyebrow {
+        font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 4px;
+        text-transform: uppercase; color: var(--accent-light); opacity: 0.9;
+        text-shadow: 0 0 12px rgba(0,0,0,0.9), 0 0 28px rgba(0,0,0,0.7);
+      }
+      .hero-hindi {
+        font-family: 'Hind', sans-serif; font-size: clamp(2.8rem,7vw,5.5rem);
+        font-weight: 500; color: #fff8ee; line-height: 1.1;
+        text-shadow: 0 0 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.95),
+                     0 0 50px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,1);
+      }
+      .hero-sub {
+        font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 3px;
+        color: rgba(255,248,238,0.8); text-transform: uppercase;
+        text-shadow: 0 0 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.7);
+      }
+      .hero-english {
+        font-family: 'Cormorant Garamond', serif; font-size: clamp(1rem,2.5vw,1.4rem);
+        color: rgba(255,248,238,0.92); font-style: italic; font-weight: 300;
+        letter-spacing: 0.5px; max-width: 640px;
+        text-shadow: 0 0 10px rgba(0,0,0,0.95), 0 0 24px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,1);
+      }
+      .divider-ornament {
+        display: flex; align-items: center; gap: 12px;
+        color: var(--accent-light); font-size: 1.2rem;
+        text-shadow: 0 0 14px rgba(0,0,0,0.9);
+      }
+      .divider-ornament::before, .divider-ornament::after {
+        content:''; width:60px; height:1px;
+        background: linear-gradient(to right, transparent, var(--accent-light));
+      }
+      .divider-ornament::after { background: linear-gradient(to left, transparent, var(--accent-light)); }
+
+      .hero-btn {
+        display: inline-block; margin-top: 8px; padding: 14px 36px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        color: white; text-decoration: none; border-radius: 50px;
+        font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase;
+        box-shadow: 0 4px 24px rgba(26,122,138,0.55);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(26,122,138,0.7); }
+
+      .scroll-hint {
+        position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+        z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 6px;
+        color: rgba(255,255,255,0.5); font-family: 'Cinzel', serif; font-size: 0.6rem;
+        letter-spacing: 2px; text-transform: uppercase; animation: bounce 2s ease-in-out infinite;
+      }
+      .scroll-hint::after { content: '↓'; font-size: 1rem; }
+      @keyframes bounce {
+        0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)}
+      }
+
+      /* ── STATS STRIP ── */
+      .stats-strip { background: linear-gradient(135deg, var(--dark) 0%, #0e1f24 100%); padding: 60px 6%; }
+      .stats-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(5,1fr); gap: 20px; text-align: center; }
+      .stat-item { padding: 20px; transition: transform 0.25s ease; cursor: default; }
+      .stat-item:hover { transform: translateY(-4px); }
+      .stat-number { font-family: 'Cinzel Decorative', serif; font-size: 2rem; color: var(--accent-light); display: block; line-height: 1; margin-bottom: 8px; }
+      .stat-label { font-size: 0.78rem; color: rgba(255,248,238,0.55); letter-spacing: 1px; text-transform: uppercase; font-family: 'Cinzel', serif; }
+
+      /* ── SHARED LAYOUT ── */
+      .section-full { padding: 90px 6%; }
+      .section-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+      .section-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.5rem,3vw,2.2rem); color: var(--dark); line-height: 1.25; margin-bottom: 24px; }
+      .section-body { font-size: 1.05rem; color: var(--muted); max-width: 700px; line-height: 1.85; margin-bottom: 16px; }
+      .gold-rule { width: 60px; height: 3px; background: linear-gradient(to right, var(--accent), var(--gold)); border-radius: 2px; margin-bottom: 32px; }
+
+      /* ── ABOUT SECTION ── */
+      .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; max-width: 1180px; margin: 0 auto; }
+      .info-table { width: 100%; border-collapse: collapse; margin-top: 28px; }
+      .info-table tr { border-bottom: 1px solid rgba(26,122,138,0.12); }
+      .info-table tr:last-child { border-bottom: none; }
+      .info-table td { padding: 11px 6px; font-size: 0.92rem; }
+      .info-table td:first-child { color: var(--accent); font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; width: 40%; }
+      .info-table td:last-child { color: var(--text); font-weight: 500; }
+      .about-image-box {
+        aspect-ratio: 4/3; background: linear-gradient(135deg, #c8e8ee, #a0ccd6);
+        border-radius: 20px; overflow: hidden; position: relative;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 2px dashed rgba(26,122,138,0.35);
+        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--muted);
+      }
+      .about-image-box img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+      .placeholder-text { font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:2px; text-transform:uppercase; opacity:0.45; }
+
+      /* ── DETAILS CARDS ── */
+      .details-bg { background: var(--cream-dark); }
+      .details-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 40px; max-width: 1180px; margin-left: auto; margin-right: auto; }
+      .detail-card {
+        background: white; padding: 28px; border-radius: 16px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.07); border-top: 3px solid var(--accent);
+        transition: transform 0.28s ease, box-shadow 0.28s ease;
+      }
+      .detail-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+      .detail-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
+      .detail-card h4 { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--dark); margin-bottom: 8px; letter-spacing: 0.5px; }
+      .detail-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.72; }
+
+      /* ── GALLERY ── */
+      .gallery-bg { background: var(--dark); }
+      .gallery-section-label { color: var(--accent-light) !important; }
+      .gallery-section-title { color: var(--cream) !important; }
+      .gallery-grid {
+        display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+        max-width: 1180px; margin: 40px auto 0;
+      }
+      .g-item {
+        position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: 14px;
+        cursor: pointer; background: linear-gradient(135deg, #0e2028, #0a1820);
+        border: 1px solid rgba(26,122,138,0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .g-item:hover { transform: scale(1.03); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+      .g-item img { width:100%; height:100%; object-fit:cover; transition: transform 0.4s ease; }
+      .g-item:hover img { transform: scale(1.08); }
+      .g-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%);
+        display: flex; align-items: flex-end; padding: 16px;
+        opacity: 0; transition: opacity 0.3s ease;
+      }
+      .g-item:hover .g-overlay { opacity: 1; }
+      .g-overlay span { color: white; font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 1px; }
+      .g-placeholder {
+        display: flex; align-items: center; justify-content: center; flex-direction: column;
+        gap: 8px; height: 100%;
+      }
+      .g-placeholder span:first-child { font-size: 2rem; opacity: 0.2; }
+      .g-placeholder span:last-child { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.25); }
+
+      /* ── LIGHTBOX ── */
+      #lightbox {
+        display: none; position: fixed; inset: 0; z-index: 10000;
+        background: rgba(0,0,0,0.93); align-items: center; justify-content: center;
+        flex-direction: column; gap: 16px; padding: 20px;
+      }
+      #lightbox.open { display: flex; }
+      #lb-img { max-width: 90vw; max-height: 75vh; border-radius: 10px; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+      #lb-caption { color: rgba(255,248,238,0.8); font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:1px; text-align:center; }
+      #lb-counter { color: rgba(255,255,255,0.35); font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:2px; }
+      .lb-close {
+        position: absolute; top: 20px; right: 28px; background: none; border: none;
+        color: white; font-size: 2rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;
+      }
+      .lb-close:hover { opacity: 1; }
+      .lb-nav { display: flex; gap: 16px; margin-top: 8px; }
+      .lb-btn {
+        background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+        color: white; padding: 10px 24px; border-radius: 30px; cursor: pointer;
+        font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:1px;
+        transition: background 0.2s;
+      }
+      .lb-btn:hover { background: rgba(26,122,138,0.4); }
+
+      /* ── ROUTE ── */
+      .route-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; max-width: 1180px; margin: 0 auto; }
+      .route-image-box {
+        aspect-ratio: 4/3; background: linear-gradient(135deg, #c8e0ee, #a0c0d6);
+        border-radius: 20px; overflow: hidden; position: relative;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12); border: 2px dashed rgba(26,122,138,0.35);
+        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--muted);
+      }
+      .route-image-box img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+      .route-stops { display: flex; flex-direction: column; gap: 0; }
+      .stop-item {
+        display: flex; align-items: flex-start; gap: 16px; padding: 14px 0;
+        border-bottom: 1px solid rgba(26,122,138,0.12);
+        opacity: 0; transform: translateX(-24px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .stop-item:last-child { border-bottom: none; }
+      .stop-item.visible { opacity:1; transform:translateX(0); }
+      .stop-item.current { background: rgba(26,122,138,0.06); border-radius: 10px; padding: 14px 12px; margin: 0 -12px; }
+      .stop-dot {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        font-size: 0.7rem; color: white; font-family: 'Cinzel', serif; font-weight: 700;
+        box-shadow: 0 4px 12px rgba(26,122,138,0.4);
+      }
+      .stop-dot.highlight { background: linear-gradient(135deg, var(--saffron), var(--gold)); box-shadow: 0 4px 16px rgba(200,81,26,0.5); transform: scale(1.15); }
+      .stop-info h4 { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--dark); margin-bottom: 2px; }
+      .stop-info p { font-size: 0.8rem; color: var(--muted); }
+      .stop-badge { display: inline-block; margin-top: 4px; padding: 2px 10px; background: rgba(200,81,26,0.1); color: var(--saffron); border-radius: 12px; font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.5px; }
+
+      /* ── TIPS ── */
+      .tips-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 40px; }
+      .tip-card {
+        background: white; padding: 28px; border-radius: 16px;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.07); border-left: 4px solid var(--accent);
+        transition: transform 0.28s ease, box-shadow 0.28s ease;
+      }
+      .tip-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+      .tip-icon { font-size: 1.8rem; margin-bottom: 14px; display: block; }
+      .tip-card h4 { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--dark); margin-bottom: 8px; letter-spacing: 0.5px; }
+      .tip-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.72; }
+
+      /* ── FOOTER ── */
+      footer { background: var(--deep); color: rgba(255,248,238,0.7); text-align: center; padding: 60px 20px 40px; border-top: 1px solid rgba(26,122,138,0.2); }
+      .footer-logo { font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; color: var(--gold-light); margin-bottom: 10px; }
+      .footer-tagline { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: rgba(255,248,238,0.45); margin-bottom: 28px; }
+      .footer-divider { width: 80px; height: 1px; background: linear-gradient(to right, transparent, var(--accent-light), transparent); margin: 20px auto; }
+      .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+      .footer-links a { font-family:'Cinzel',serif; font-size:0.7rem; color:rgba(255,248,238,0.45); text-decoration:none; letter-spacing:1px; text-transform:uppercase; transition:color 0.2s; }
+      .footer-links a:hover { color: var(--gold-light); }
+      .footer-copy { font-size: 0.75rem; color: rgba(255,248,238,0.3); font-family: 'Cinzel', serif; letter-spacing: 1px; }
+
+      /* ── SCROLL REVEAL ── */
+      .reveal { opacity:0; transform:translateY(38px); transition:opacity 0.75s cubic-bezier(.22,1,.36,1), transform 0.75s cubic-bezier(.22,1,.36,1); }
+      .reveal.visible { opacity:1; transform:translateY(0); }
+      .reveal-left { opacity:0; transform:translateX(-44px); transition:opacity 0.75s cubic-bezier(.22,1,.36,1), transform 0.75s cubic-bezier(.22,1,.36,1); }
+      .reveal-left.visible { opacity:1; transform:translateX(0); }
+      .reveal-right { opacity:0; transform:translateX(44px); transition:opacity 0.75s cubic-bezier(.22,1,.36,1), transform 0.75s cubic-bezier(.22,1,.36,1); }
+      .reveal-right.visible { opacity:1; transform:translateX(0); }
+      .reveal-scale { opacity:0; transform:scale(0.87); transition:opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
+      .reveal-scale.visible { opacity:1; transform:scale(1); }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 900px) {
+        .about-grid, .route-layout { grid-template-columns: 1fr; gap: 40px; }
+        .details-grid, .tips-grid { grid-template-columns: 1fr 1fr; }
+        .gallery-grid { grid-template-columns: 1fr 1fr; }
+        .stats-inner { grid-template-columns: repeat(3,1fr); }
+      }
+      @media (max-width: 580px) {
+        .details-grid, .tips-grid, .gallery-grid { grid-template-columns: 1fr; }
+        .stats-inner { grid-template-columns: repeat(2,1fr); }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- LOADER -->
+    <div id="loader">
+      <div class="loader-om">यमु</div>
+      <div class="loader-title">Yamunotri</div>
+      <div class="loader-sub">First Dham · Char Dham Yatra</div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div id="progressBar"></div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+      <button class="lb-close" id="lbClose">×</button>
+      <img id="lb-img" src="" alt="" />
+      <div id="lb-caption"></div>
+      <div id="lb-counter"></div>
+      <div class="lb-nav">
+        <button class="lb-btn" id="lbPrev">← Prev</button>
+        <button class="lb-btn" id="lbNext">Next →</button>
+      </div>
+    </div>
+
+    <!-- NAV -->
+    <nav>
+      <a href="index.html" class="nav-logo">🕉 Rocket Guide</a>
+      <a href="index.html" class="nav-back">← Back to Char Dham</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <img src="images/yamunotri.jpg" alt="Yamunotri Temple" class="hero-image"
+           onerror="this.src=''; this.style.display='none'" />
+      <div class="hero-overlay"></div>
+
+      <!-- Floating petals -->
+      <div class="petal" style="left:9%;width:46px;height:46px;background:#2ab0c8;animation-duration:19s;animation-delay:0s;opacity:0.12"></div>
+      <div class="petal" style="left:28%;width:32px;height:32px;background:#F5A623;animation-duration:24s;animation-delay:6s;opacity:0.09"></div>
+      <div class="petal" style="left:62%;width:40px;height:40px;background:#1a7a8a;animation-duration:16s;animation-delay:10s;opacity:0.11"></div>
+      <div class="petal" style="left:83%;width:28px;height:28px;background:#2ab0c8;animation-duration:22s;animation-delay:14s;opacity:0.08"></div>
+      <div class="petal" style="left:47%;width:26px;height:26px;background:#F5A623;animation-duration:21s;animation-delay:3s;opacity:0.07"></div>
+
+      <div class="hero-content">
+        <span class="hero-eyebrow">🏔️ First Dham · Char Dham Yatra · Uttarkashi, Uttarakhand</span>
+        <h1 class="hero-hindi">यमुनोत्री</h1>
+        <span class="hero-sub">Yamunotri</span>
+        <div class="divider-ornament">❄</div>
+        <p class="hero-english">
+          The sacred source of River Yamuna, nestled at 3,291m in the Garhwal Himalayas —
+          a divine gateway to purification and eternal grace.
+        </p>
+        <a href="#about" class="hero-btn">Explore the Dham</a>
+      </div>
+      <div class="scroll-hint">Scroll</div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stats-inner">
+        <div class="stat-item reveal" style="transition-delay:0s">
+          <span class="stat-number" data-target="3291" data-suffix="m">3291m</span>
+          <span class="stat-label">Altitude</span>
+        </div>
+        <div class="stat-item reveal" style="transition-delay:0.1s">
+          <span class="stat-number" data-target="6" data-suffix=" km">6 km</span>
+          <span class="stat-label">Trek Length</span>
+        </div>
+        <div class="stat-item reveal" style="transition-delay:0.2s">
+          <span class="stat-number" data-target="1" data-suffix="st">1st</span>
+          <span class="stat-label">Dham in Circuit</span>
+        </div>
+        <div class="stat-item reveal" style="transition-delay:0.3s">
+          <span class="stat-number" data-target="220" data-prefix="~" data-suffix=" km">~220 km</span>
+          <span class="stat-label">From Haridwar</span>
+        </div>
+        <div class="stat-item reveal" style="transition-delay:0.4s">
+          <span class="stat-number" data-target="6" data-suffix=" hrs">6 hrs</span>
+          <span class="stat-label">Drive + Trek</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT / OVERVIEW -->
+    <div class="section-full" id="about">
+      <div class="about-grid">
+        <div class="reveal-left">
+          <p class="section-label">The First Dham</p>
+          <h2 class="section-title">Yamunotri — Origin of the Yamuna</h2>
+          <div class="gold-rule"></div>
+          <p class="section-body">
+            Yamunotri is the westernmost shrine of the Char Dham circuit, dedicated to Goddess Yamuna —
+            the daughter of Surya (Sun God) and twin sister of Yama, the God of Death. It is believed
+            that bathing in the Yamuna cleanses one of all sins and grants liberation from the fear of death.
+          </p>
+          <p class="section-body">
+            The actual source of the Yamuna river lies at the Champasar Glacier on the Kalind Parvat peak
+            (~4,421m), about 1 km above the temple. Devotees carry water from the Surya Kund hot spring
+            and cook rice in its boiling waters as an offering — a ritual unique to Yamunotri.
+          </p>
+          <table class="info-table">
+            <tr><td>Deity</td><td>Goddess Yamuna (Yami)</td></tr>
+            <tr><td>Location</td><td>Uttarkashi district, Uttarakhand</td></tr>
+            <tr><td>Altitude</td><td>3,291 m (10,797 ft)</td></tr>
+            <tr><td>Nearest Road</td><td>Janki Chatti (6 km trek)</td></tr>
+            <tr><td>River</td><td>Yamuna (Yamunotri origin)</td></tr>
+            <tr><td>Temple Opens</td><td>Akshaya Tritiya (Apr–May)</td></tr>
+            <tr><td>Temple Closes</td><td>Yama Dwitiya (Nov)</td></tr>
+            <tr><td>Architecture</td><td>Hemkund style, rebuilt 19th century</td></tr>
+          </table>
+        </div>
+        <div class="about-image-box reveal-right">
+          <img src="images/yamunotri-main.jpg" alt="Yamunotri Temple" onerror="this.style.display='none'" />
+          <span class="placeholder-text">Yamunotri Temple</span>
+          <span style="font-size:3rem;opacity:0.18">🏔️</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILS CARDS -->
+    <div class="section-full details-bg">
+      <div style="max-width:1180px;margin:0 auto;">
+        <p class="section-label reveal">Temple & Surroundings</p>
+        <h2 class="section-title reveal">Key Highlights of Yamunotri</h2>
+        <div class="gold-rule reveal"></div>
+        <div class="details-grid">
+          <div class="detail-card reveal-scale" style="transition-delay:0s">
+            <span class="detail-icon">♨️</span>
+            <h4>Surya Kund</h4>
+            <p>The most sacred hot spring at Yamunotri with near-boiling temperatures (~94°C). Pilgrims cook rice and potatoes in muslin cloth here as prasad offerings to the goddess.</p>
+          </div>
+          <div class="detail-card reveal-scale" style="transition-delay:0.1s">
+            <span class="detail-icon">🏛️</span>
+            <h4>Yamunotri Temple</h4>
+            <p>Built by Maharani Guleria of Jaipur in the 19th century and later rebuilt after earthquake damage. Houses a black marble idol of Goddess Yamuna and a silver idol of Ganga.</p>
+          </div>
+          <div class="detail-card reveal-scale" style="transition-delay:0.2s">
+            <span class="detail-icon">❄️</span>
+            <h4>Divya Shila</h4>
+            <p>A sacred rock pillar situated near the temple that is worshipped before entering the main shrine. Devotees offer prayers here as part of the traditional ritual.</p>
+          </div>
+          <div class="detail-card reveal-scale" style="transition-delay:0.3s">
+            <span class="detail-icon">🌊</span>
+            <h4>Janki Chatti</h4>
+            <p>The base camp for the Yamunotri trek at 2,650m. All vehicles stop here. The 6 km paved trek begins from this village, passing scenic forests and the Yamuna river.</p>
+          </div>
+          <div class="detail-card reveal-scale" style="transition-delay:0.4s">
+            <span class="detail-icon">🛕</span>
+            <h4>Kharsali Village</h4>
+            <p>The winter home of the Yamunotri deity. During the winter closure, the idol is shifted to this village temple 3 km from Janki Chatti where worship continues till spring.</p>
+          </div>
+          <div class="detail-card reveal-scale" style="transition-delay:0.5s">
+            <span class="detail-icon">🌺</span>
+            <h4>Saptrishi Kund</h4>
+            <p>A glacial lake at ~4,500m above the temple, said to be the abode of the seven sages. Accessible only by a difficult high-altitude trek, rarely visited but deeply sacred.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTO GALLERY -->
+    <div class="section-full gallery-bg" id="gallery">
+      <div style="max-width:1180px;margin:0 auto;">
+        <p class="section-label gallery-section-label reveal">Divine Darshan</p>
+        <h2 class="section-title gallery-section-title reveal">Photo Gallery</h2>
+        <div class="gold-rule" style="background:linear-gradient(to right,var(--accent),var(--accent-light));"></div>
+      </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ROUTE TO YAMUNOTRI -->
+    <div class="section-full" id="route" style="background:var(--cream);">
+      <div class="route-layout">
+        <div class="reveal-left">
+          <p class="section-label">How to Reach</p>
+          <h2 class="section-title">Route to Yamunotri</h2>
+          <div class="gold-rule"></div>
+          <div class="route-stops">
+            <div class="stop-item">
+              <div class="stop-dot">H</div>
+              <div class="stop-info"><h4>Haridwar / Rishikesh</h4><p>Gateway city · Nearest railhead</p></div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-dot">D</div>
+              <div class="stop-info"><h4>Dehradun</h4><p>~55 km from Haridwar · Nearest airport (Jolly Grant)</p></div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-dot">B</div>
+              <div class="stop-info"><h4>Barkot</h4><p>~170 km from Haridwar · Overnight halt · Base town</p></div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-dot">J</div>
+              <div class="stop-info"><h4>Janki Chatti</h4><p>~210 km from Haridwar · Trek starting point (2,650m)</p></div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-dot highlight">Y</div>
+              <div class="stop-info">
+                <h4>Yamunotri Temple</h4>
+                <p>6 km trek from Janki Chatti · Altitude 3,291m</p>
+                <span class="stop-badge">You Are Here 🙏</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="route-image-box reveal-right">
+          <img src="images/yamunotri-route.jpg" alt="Yamunotri Route" onerror="this.style.display='none'" />
+          <span class="placeholder-text">Route Map Image</span>
+          <span style="font-size:2.5rem;opacity:0.2">🗺️</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISITOR TIPS -->
+    <div class="section-full" style="background:var(--cream-dark);">
+      <div style="max-width:1180px;margin:0 auto;">
+        <p class="section-label reveal">Visitor Essentials</p>
+        <h2 class="section-title reveal">Tips for Yamunotri Yatra</h2>
+        <div class="gold-rule reveal"></div>
+        <div class="tips-grid">
+          <div class="tip-card reveal" style="transition-delay:0s">
+            <span class="tip-icon">🥾</span>
+            <h4>The 6 km Trek</h4>
+            <p>The paved trail from Janki Chatti takes 2–3 hours each way. Ponies and palanquins (dolis) are available for those who cannot walk.</p>
+          </div>
+          <div class="tip-card reveal" style="transition-delay:0.1s">
+            <span class="tip-icon">🌡️</span>
+            <h4>Weather & Clothing</h4>
+            <p>Even in May–June, temperatures drop sharply after sunset. Carry thermal layers, waterproof jacket, gloves, and sturdy trekking shoes.</p>
+          </div>
+          <div class="tip-card reveal" style="transition-delay:0.2s">
+            <span class="tip-icon">🍚</span>
+            <h4>Surya Kund Prasad</h4>
+            <p>Bring raw rice in a muslin cloth to cook in the hot spring. This is the unique Yamunotri tradition — the cooked rice is taken home as blessed prasad.</p>
+          </div>
+          <div class="tip-card reveal" style="transition-delay:0.3s">
+            <span class="tip-icon">📋</span>
+            <h4>Registration</h4>
+            <p>Biometric registration is mandatory. Register online at the official Uttarakhand Char Dham Devasthanam portal before departure.</p>
+          </div>
+          <div class="tip-card reveal" style="transition-delay:0.4s">
+            <span class="tip-icon">🏨</span>
+            <h4>Accommodation</h4>
+            <p>Basic dharamshalas and GMVN guesthouses are available at Janki Chatti and Barkot. Book well in advance during May–June peak season.</p>
+          </div>
+          <div class="tip-card reveal" style="transition-delay:0.5s">
+            <span class="tip-icon">⏰</span>
+            <h4>Best Time</h4>
+            <p>May–June for the classic yatra. September–October for smaller crowds and clearer post-monsoon mountain views. Temple remains closed Nov–Apr.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo reveal">यमुनोत्री · Yamunotri</div>
+      <p class="footer-tagline reveal">First Dham of the Char Dham Yatra · Uttarakhand</p>
+      <div class="footer-divider"></div>
+      <div class="footer-links reveal">
+        <a href="index.html">← Char Dham Home</a>
+        <a href="#about">About</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#route">Route</a>
+      </div>
+      <p class="footer-copy reveal">Built with ❤️ by Rocket Guide · Char Dham Yatra Guide 2025</p>
+    </footer>
+
+  <script>
+    // ── GALLERY DATA ──
+    const GALLERY = [
+      { src: 'images/yamunotri-g1.jpg', caption: 'Yamunotri Temple shrine' },
+      { src: 'images/yamunotri-g2.jpg', caption: 'Surya Kund hot spring' },
+      { src: 'images/yamunotri-g3.jpg', caption: 'Trek path to the temple' },
+      { src: 'images/yamunotri-g4.jpg', caption: 'Yamuna river at origin' },
+      { src: 'images/yamunotri-g5.jpg', caption: 'Divya Shila sacred rock' },
+      { src: 'images/yamunotri-g6.jpg', caption: 'Pilgrims on the yatra' },
+      { src: 'images/yamunotri-g7.jpg', caption: 'Janki Chatti base camp' },
+      { src: 'images/yamunotri-g8.jpg', caption: 'Snow-capped peaks above' },
+      { src: 'images/yamunotri-g9.jpg', caption: 'Sunrise over the valley' },
+    ];
+
+    // Build gallery
+    const grid = document.getElementById('galleryGrid');
+    GALLERY.forEach((img, i) => {
+      const item = document.createElement('div');
+      item.className = 'g-item reveal-scale';
+      item.style.transitionDelay = (i * 0.07) + 's';
+      item.innerHTML = `
+        <img src="${img.src}" alt="${img.caption}" loading="lazy"
+             onerror="this.style.display='none';this.parentElement.querySelector('.g-placeholder').style.display='flex'">
+        <div class="g-placeholder" style="display:none">
+          <span>🏔️</span>
+          <span>${img.caption}</span>
+        </div>
+        <div class="g-overlay"><span>${img.caption}</span></div>
+      `;
+      item.addEventListener('click', () => openLightbox(i));
+      grid.appendChild(item);
+    });
+
+    // ── LIGHTBOX ──
+    let lbIndex = 0;
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lb-img');
+    const lbCaption = document.getElementById('lb-caption');
+    const lbCounter = document.getElementById('lb-counter');
+
+    function openLightbox(i) {
+      lbIndex = i;
+      updateLightbox();
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function updateLightbox() {
+      lbImg.src = GALLERY[lbIndex].src;
+      lbCaption.textContent = GALLERY[lbIndex].caption;
+      lbCounter.textContent = (lbIndex + 1) + ' / ' + GALLERY.length;
+    }
+    document.getElementById('lbClose').addEventListener('click', () => {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    document.getElementById('lbPrev').addEventListener('click', () => {
+      lbIndex = (lbIndex - 1 + GALLERY.length) % GALLERY.length;
+      updateLightbox();
+    });
+    document.getElementById('lbNext').addEventListener('click', () => {
+      lbIndex = (lbIndex + 1) % GALLERY.length;
+      updateLightbox();
+    });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'ArrowLeft') { lbIndex = (lbIndex-1+GALLERY.length)%GALLERY.length; updateLightbox(); }
+      if (e.key === 'ArrowRight') { lbIndex = (lbIndex+1)%GALLERY.length; updateLightbox(); }
+      if (e.key === 'Escape') { lb.classList.remove('open'); document.body.style.overflow=''; }
+    });
+    lb.addEventListener('click', e => { if (e.target === lb) { lb.classList.remove('open'); document.body.style.overflow=''; }});
+
+    // ── LOADER ── (hide after max 1.9s regardless of image load status)
+    const hideLoader = () => document.getElementById('loader').classList.add('hidden');
+    setTimeout(hideLoader, 1900);
+    window.addEventListener('load', hideLoader);
+
+    // ── PROGRESS BAR & NAV SHRINK ──
+    window.addEventListener('scroll', () => {
+      const s = document.documentElement.scrollTop;
+      const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('progressBar').style.width = (h > 0 ? (s/h)*100 : 0) + '%';
+      document.querySelector('nav').classList.toggle('scrolled', s > 60);
+    });
+
+    // ── SCROLL REVEAL ──
+    const revealEls = document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.stop-item');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const siblings = entry.target.parentElement.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale');
+        let delay = 0;
+        siblings.forEach((s, i) => { if (s === entry.target) delay = i * 75; });
+        setTimeout(() => entry.target.classList.add('visible'), delay);
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => obs.observe(el));
+
+    // ── STAT COUNTER ──
+    const statObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseInt(el.dataset.target, 10);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        if (isNaN(target)) return;
+        const start = performance.now();
+        const duration = 1400;
+        const step = now => {
+          const p = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          el.textContent = prefix + Math.round(ease * target).toLocaleString() + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        statObs.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-number[data-target]').forEach(el => statObs.observe(el));
+
+    // ── HERO PARALLAX ──
+    const heroImg = document.querySelector('.hero-image');
+    if (heroImg) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY < window.innerHeight)
+          heroImg.style.transform = `translateY(${window.scrollY * 0.28}px)`;
+      }, { passive: true });
+    }
+  </script>
+  </body>
+</html>
